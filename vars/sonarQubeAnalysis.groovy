@@ -7,13 +7,13 @@ def call() {
     def sonarqubeCredentialsId = 'sonar-token'
 
     // Define other properties for SonarQube analysis
-    def projectName = 'ivolve'
-    def projectKey = 'ivolve'
+    def projectName = 'ivolve-proj'
+    def projectKey = 'ivolve-proj'
 
     // Run withSonarQubeEnv to inject SonarQube environment variables
     withSonarQubeEnv(credentialsId: sonarqubeCredentialsId) {
         // Assuming you have a SonarQube tool installation named 'SonarQubeScanner'
-        def scannerHome = tool name: 'sonar-scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+        def scannerHome = tool name: 'sonarqube-server', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
         
         sh """
         ${scannerHome}/bin/sonar-scanner \
