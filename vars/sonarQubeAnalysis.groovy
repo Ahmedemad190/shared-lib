@@ -1,25 +1,31 @@
 #!/usr/bin/env groovy
-
 def call() {
     echo "Running SonarQube Analysis..."
-
-    // Define your SonarQube server configuration credentials ID
-    def sonarqubeCredentialsId = 'sonar-token'
-
-    // Define other properties for SonarQube analysis
-    def projectName = 'ivolve-proj'
-    def projectKey = 'ivolve-proj'
-
-    // Run withSonarQubeEnv to inject SonarQube environment variables
-    withSonarQubeEnv(credentialsId: sonarqubeCredentialsId) {
-        // Assuming you have a SonarQube tool installation named 'SonarQubeScanner'
-        def scannerHome = tool name: 'gradle', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+    
+    dir('application') {
+        // First ensure gradlew is executable
+        sh 'chmod +x ./gradlew'
         
-        sh """
-        ${scannerHome}/bin/sonar-scanner \
-          -Dsonar.projectName=${projectName} \
-          -Dsonar.projectKey=${projectKey} \
-          -Dsonar.java.binaries=.
-        """
+        withSonarQubeEnv(credentialsId: 'sonar-token', installationName: 'sonarqube-server') {
+            // Use gradlew with explicit Java options
+            sh """
+                ./gradlew sonar \
+                    -Dsonar.projectKey=ivolve-proj \
+                    -Dsonar.projectName=ivolve-proj \
+                    -Dsonar.sourceEncoding=UTF-8 \
+                    -Dsonar.sources=src/main \
+                    -Dsonar.tests=src/test \
+                    -Dsonar.java.binaries=build/classes \
+                    -Dsonar.gradle.skipCompile=false
+            """
+        }
+        
+        // Optional: Wait for quality gate
+        timeout(time: 1, unit: 'HOURS') {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+            }
+        }
     }
 }
