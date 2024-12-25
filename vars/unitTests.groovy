@@ -1,5 +1,13 @@
+#!/usr/bin/env groovy
+
 def call() {
     echo "Running Unit Test..."
-    sh 'chmod +x ./gradlew'  // Add this line to make gradlew executable
-    sh './gradlew clean test'
+        // Use tr command instead of dos2unix
+        sh '''
+            tr -d '\r' < ./gradlew > ./gradlew.tmp
+            mv ./gradlew.tmp ./gradlew
+            chmod +x ./gradlew
+            ./gradlew clean test
+        '''
+    
 }
