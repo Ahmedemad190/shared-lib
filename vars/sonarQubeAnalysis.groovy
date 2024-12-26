@@ -14,8 +14,8 @@ def call() {
         withSonarQubeEnv(credentialsId: 'sonar-token', installationName: 'sonarqube-server') {
             sh """
                 ./gradlew sonar \
-                    -Dsonar.projectKey=ivolve-proj \
-                    -Dsonar.projectName=ivolve-proj \
+                    -Dsonar.projectKey=ivolve-2 \
+                    -Dsonar.projectName=ivolve-2 \
                     -Dsonar.java.source=11
             """
         }
