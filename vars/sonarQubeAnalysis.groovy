@@ -2,12 +2,14 @@
 def call() {
     echo "Running SonarQube Analysis..."
     
-    dir('application') {
-        // First ensure gradlew is executable
-        sh 'chmod +x ./gradlew'
-        
-        // Clean and build first to ensure we have compiled classes
-        sh './gradlew clean build'
+    // Debug: List contents of workspace
+    sh 'pwd'
+    sh 'ls -la'
+    
+    // If gradlew is in root directory instead of /application
+    // dir('application') {
+        // Debug: List contents of application directory
+        // sh 'ls -la'
         
         withSonarQubeEnv(credentialsId: 'sonar-token', installationName: 'sonarqube-server') {
             sh """
@@ -17,5 +19,5 @@ def call() {
                     -Dsonar.java.source=11
             """
         }
-    }
+    // }
 }
